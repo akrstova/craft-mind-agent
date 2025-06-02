@@ -1,0 +1,18 @@
+[project]
+name = "craft-mind-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "geopy>=2.4.1",
+    "googlemaps>=4.10.0",
+    "gradio>=5.32.0",
+    "ipython>=9.3.0",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.24",
+    "langchain-google-genai>=2.1.5",
+    "langchain-tavily>=0.2.0",
+    "langgraph-supervisor>=0.0.27",
+    "python-dotenv>=1.1.0",
+]
