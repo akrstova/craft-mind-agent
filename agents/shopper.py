@@ -9,8 +9,6 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from googlemaps.places import places_nearby
 from geopy.geocoders import Nominatim
 
-import agents.format_utils as format_utils
-
 
 
 load_dotenv()
