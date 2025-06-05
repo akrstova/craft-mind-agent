@@ -9,6 +9,8 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from googlemaps.places import places_nearby
 from geopy.geocoders import Nominatim
 
+import agents.format_utils as format_utils
+
 
 
 load_dotenv()
@@ -18,16 +20,17 @@ gmaps_client = googlemaps.Client(key=API_KEY)
 
 model = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 
+@tool
 def add(a: float, b: float):
     """Add two numbers."""
     return a + b
 
-
+@tool
 def multiply(a: float, b: float):
     """Multiply two numbers."""
     return a * b
 
-
+@tool
 def divide(a: float, b: float):
     """Divide two numbers."""
     return a / b

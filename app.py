@@ -20,6 +20,7 @@ def chat_with_agent(message, history):
 
     # Extract final response
     final_response = "\n".join([msg.content for msg in response["messages"]])
+    print(len(response["messages"]))
     # final_response = response["messages"][-1].content
 
     return final_response
@@ -33,7 +34,7 @@ demo = gr.ChatInterface(
     examples=[
         "I want to learn how to knit",
         "What supplies do I need for origami?",
-        "Can you help me find yarn shops in Berlin?"
+        "I want to learn Bulgarian lacework"
     ]
 )
 
