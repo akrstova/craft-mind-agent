@@ -1,15 +1,11 @@
-import os
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langchain.tools import tool
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.utils.function_calling import convert_to_openai_tool
-from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
-from langchain.chains.llm import LLMChain
+from langchain.chains import LLMChain
 from langchain_core.output_parsers.string import StrOutputParser
-from pydantic import BaseModel
 
 
 load_dotenv()
@@ -25,7 +21,7 @@ Respond only with the name of the language (e.g. 'Bulgarian', 'Japanese', 'Engli
 )
 
 # Chain using your model
-language_detection_chain = model | language_detection_prompt
+language_detection_chain = LLMChain(llm=model, prompt=language_detection_prompt, output_parser=StrOutputParser())
 
 # Tool function
 @tool
@@ -50,7 +46,7 @@ translate_prompt = PromptTemplate.from_template(
     ---
     """
 )
-translate_chain = model | translate_prompt
+translate_chain = LLMChain(llm=model, prompt=translate_prompt, output_parser=StrOutputParser())
 
 @tool
 def translate_to_english(text: str) -> str:
@@ -74,7 +70,7 @@ summarize_prompt = PromptTemplate.from_template(
     ---
     """
 )
-summarize_chain = model | summarize_prompt
+summarize_chain = LLMChain(llm=model, prompt=summarize_prompt, output_parser=StrOutputParser())
 
 @tool
 def summarize_craft_intro(text: str) -> str:
@@ -102,7 +98,7 @@ craft_research_agent = create_react_agent(
         You are a helpful craft researcher assistant.
 
         Your job is to research traditional or exotic crafts — such as Bulgarian lacework — using reliable online sources (in the language of origin if needed), and return a beginner-friendly summary that teaches the user what the craft is and how to get started.
-
+        Use the available tools to find the relevant information.
         Please follow this exact structure in your response:
 
         === What is it? ===

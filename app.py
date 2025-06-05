@@ -3,27 +3,34 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 from agents.planner import supervisor
 
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+
 def chat_with_agent(message, history):
     # Convert Gradio history to LangChain messages
     messages = []
-
-    # Each item in history is a [user, assistant] pair
     for user_msg, assistant_msg in history:
         messages.append(HumanMessage(content=user_msg))
         messages.append(AIMessage(content=assistant_msg))
-
-    # Append the current user message
     messages.append(HumanMessage(content=message))
 
-    # Run supervisor with full chat history
+    # Run supervisor with full message history
     response = supervisor.invoke({"messages": messages})
 
-    # Extract final response
-    final_response = "\n".join([msg.content for msg in response["messages"]])
-    print(len(response["messages"]))
-    # final_response = response["messages"][-1].content
+    # Filter out system messages and duplicates
+    filtered_ai_messages = []
+    for msg in response["messages"]:
+        if isinstance(msg, AIMessage) and msg.content:
+            # Avoid including tool/system transfer messages
+            if any(skip in msg.content.lower() for skip in [
+                "transferring to", "transferring back to", "invoking tool", "calling agent"
+            ]):
+                continue
+            # Avoid duplicates from previous history
+            if msg.content not in [m[1] for m in history]:
+                filtered_ai_messages.append(msg.content)
 
-    return final_response
+    return "\n\n".join(filtered_ai_messages)
+
 
 # Create the Gradio interface
 demo = gr.ChatInterface(
