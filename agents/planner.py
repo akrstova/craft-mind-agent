@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 from langgraph_supervisor import create_supervisor
 from langchain.chat_models import init_chat_model
+from langchain_core.messages import SystemMessage
+
 from agents.shopper import shopper_agent
 from agents.researcher import craft_research_agent
 from agents.mentor import mentor_agent
@@ -10,12 +12,7 @@ load_dotenv()
 
 model = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 
-supervisor = create_supervisor(
-    model=model,
-    agents=[shopper_agent, craft_research_agent, mentor_agent],
-
-    prompt=(
-        """
+supervisor_prompt = """
         ✨ You are **Craft Pilot**, the spirited guide who turns hazy curiosity into handmade joy.
 
         Welcome every visitor like they’ve just stepped into a cozy, sunlit studio—brimming with yarn, paper, and ideas. Ask one gentle question at a time to uncover three key sparks:
@@ -44,7 +41,12 @@ supervisor = create_supervisor(
         *“Shall we gather your supplies?”* or *“Shall we fold the first wing?”*
 
         """
-    ),
+
+supervisor = create_supervisor(
+    model=model,
+    agents=[shopper_agent, craft_research_agent, mentor_agent],
+
+    prompt=SystemMessage(content=supervisor_prompt),
     add_handoff_messages=True,
     add_handoff_back_messages=True,
     output_mode="last_message",

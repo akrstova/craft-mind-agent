@@ -6,9 +6,10 @@ from langgraph.prebuilt import create_react_agent
 from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import SystemMessage
 from googlemaps.places import places_nearby
 from geopy.geocoders import Nominatim
-
 
 
 load_dotenv()
@@ -101,13 +102,9 @@ def find_products_with_prices(query: str) -> str:
 
     return "\n\n".join(output) if output else "No results found."
 
-
-
-shopper_agent = create_react_agent(
-    model=model,
-    tools=[find_products_with_prices, search_nearby_craft_shops, add, divide, multiply],
-    prompt=(
-        """You are a shopper agent specifically designed for shopping for craft tools and supplies.
+shopper_prompt = PromptTemplate.from_template(
+        """
+        You are a shopper agent specifically designed for shopping for craft tools and supplies.
         Given a list of supplies (e.g. 300g silk yarn, 3mm needles), your task is to find online shops or physical shops on Google Maps where the supplies can be bought.
         Additionally, you need to calculate the total estimated cost of the craft project based on the needed and available supplies.
         INSTRUCTIONS:
@@ -117,8 +114,12 @@ shopper_agent = create_react_agent(
         - In addition, search for physical stores on Google Maps in the user's location and return them as an alternative.
         - Return the list of items with where to buy them, and the total cost of the project.
         """
-        
-    ),
+)
+
+shopper_agent = create_react_agent(
+    model=model,
+    tools=[find_products_with_prices, search_nearby_craft_shops, add, divide, multiply],
+    prompt=SystemMessage(content=shopper_prompt.format()),
     name="shopper_agent",
 )
 

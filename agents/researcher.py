@@ -4,7 +4,8 @@ from langgraph.prebuilt import create_react_agent
 from langchain.tools import tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.chains.llm import LLMChain
+from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers.string import StrOutputParser
 
 
@@ -85,16 +86,8 @@ def summarize_craft_intro(text: str) -> str:
     return summarize_chain.run({"text": text})
 
 
-# Define the agent
-craft_research_agent = create_react_agent(
-    model=model,
-    tools=[
-        detect_search_language,
-        web_search_in_language,
-        translate_to_english,
-        summarize_craft_intro
-    ],
-   prompt = """
+research_agent_prompt = PromptTemplate.from_template(
+"""
         You are a helpful craft researcher assistant.
 
         Your job is to research traditional or exotic crafts — such as Bulgarian lacework — using reliable online sources (in the language of origin if needed), and return a beginner-friendly summary that teaches the user what the craft is and how to get started.
@@ -119,7 +112,19 @@ craft_research_agent = create_react_agent(
         Keep the tone friendly, and informative — like you're introducing the craft to someone who’s curious but knows nothing yet.
 
         DO NOT add any introduction or closing lines. Just return the structured content above.
-        """,
+        """
+)
+
+# Define the agent
+craft_research_agent = create_react_agent(
+    model=model,
+    tools=[
+        detect_search_language,
+        web_search_in_language,
+        translate_to_english,
+        summarize_craft_intro
+    ],
+   prompt = SystemMessage(content=research_agent_prompt.format()),
     name="craft_research_agent"
 )
 
