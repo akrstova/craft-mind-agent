@@ -29,7 +29,7 @@ def analyze_media(file_path: str, craft: str, project: str) -> str:
         return "⚠️ Unsupported file type."
 
     encoded = _encode_file(file_path)
-    prompt = f"The user is making a {project} using {craft}. Provide feedback based on this file."
+    prompt = f"The user uploaded a {mime_type} of their craft project ({project} in {craft}). Please give clear and kind feedback."
 
     if mime_type.startswith("video"):
         content = [
@@ -48,82 +48,17 @@ def analyze_media(file_path: str, craft: str, project: str) -> str:
     return model.invoke([HumanMessage(content=content)]).content
 
 
-@tool
-def search_youtube_tutorial(query: str) -> str:
-    """
-    Search YouTube for a public, embeddable tutorial and return the first valid result.
-    """
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    search_url = (
-        f"https://www.googleapis.com/youtube/v3/search"
-        f"?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true"
-        f"&maxResults=5&safeSearch=strict&q={requests.utils.quote(query)}"
-        f"&key={api_key}"
-    )
-    search_resp = requests.get(search_url)
-    if search_resp.status_code != 200:
-        return "⚠️ YouTube search failed."
 
-    search_items = search_resp.json().get("items", [])
-    video_ids = [item["id"]["videoId"] for item in search_items if "videoId" in item["id"]]
-
-    # Validate video status via `/videos` endpoint
-    if not video_ids:
-        return "⚠️ No video candidates found."
-
-    status_url = (
-        f"https://www.googleapis.com/youtube/v3/videos"
-        f"?part=status,snippet&id={','.join(video_ids)}&key={api_key}"
-    )
-    status_resp = requests.get(status_url)
-    if status_resp.status_code != 200:
-        return "⚠️ Failed to validate video status."
-
-    status_items = status_resp.json().get("items", [])
-    for item in status_items:
-        status = item["status"]
-        snippet = item["snippet"]
-        if status.get("embeddable") and status.get("privacyStatus") == "public":
-            video_id = item["id"]
-            title = snippet["title"]
-            channel = snippet["channelTitle"]
-            return f"🎥 **{title}** by *{channel}*\nhttps://www.youtube.com/watch?v={video_id}"
-
-    return "⚠️ No valid video found that can be embedded or viewed publicly."
-
-
-
-# 🧠 ReAct-compatible system prompt to force tool usage
+# ✅ Final clean, non-repetitive mentor system prompt
 mentor_prompt = PromptTemplate.from_template(
     """
-You are a helpful and kind craft mentor.
-
-You have two tools:
-- `analyze_media`: for analyzing uploaded images or videos.
-- `search_youtube_tutorial`: to find real video tutorials when the user asks "how do I" or needs a visual guide.
-
-Use this format:
-
-Thought: Do I need to use a tool?
-Action: the_tool_name
-Action Input: input value
-
-Then wait for the result.
-
-When you receive it:
-
-Observation: the tool result
-Thought: What did I learn?
-Final Answer: your reply to the user
-
-DO NOT make up links. Only use the tool to find real videos.
-Be concise, friendly, and invite them to take the next step.
+You are a friendly and knowledgeable craft mentor. You help users by giving clear feedback on their uploaded images or videos. Be warm, encouraging, and concise.
 """
 )
 
 mentor_agent = create_react_agent(
     model=model,
-    tools=[analyze_media, search_youtube_tutorial],
+    tools=[analyze_media],
     prompt=SystemMessage(content=mentor_prompt.format()),
     name="mentor_agent"
 )
