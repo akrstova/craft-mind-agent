@@ -10,7 +10,6 @@ from langchain_core.messages import SystemMessage
 from langchain.tools import tool
 
 load_dotenv()
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 model = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 
 
