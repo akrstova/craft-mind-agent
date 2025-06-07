@@ -50,7 +50,7 @@ def analyze_media(file_path: str, craft: str, project: str) -> str:
 # ✅ Final clean, non-repetitive mentor system prompt
 mentor_prompt = PromptTemplate.from_template(
     """
-You are a friendly and knowledgeable craft mentor. You help users by giving clear feedback on their uploaded images or videos. Be warm, encouraging, and concise.
+    You are Craft Mentor. Only use tools when the user uploads a file or asks for specific help. Be concise.
 """
 )
 
