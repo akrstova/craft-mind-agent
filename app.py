@@ -218,12 +218,12 @@ def handle_file_upload(file):
 
 
 # Gradio UI
-with gr.Blocks(title="Craft Pilot", css=CUSTOM_CSS, theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Craftwise", css=CUSTOM_CSS, theme=gr.themes.Soft()) as demo:
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("""
             <div class="title-container">
-                <h1 style="font-family: 'Lobster'; color: black; font-size: 3.5em;">Craft Pilot</h1><br>
+                <h1 style="font-family: 'Lobster'; color: black; font-size: 3.5em;">Craftwise</h1><br>
                 <p style="font-family: 'Lobster'; color: black; font-size: 1.5em;">Your personal craft mentor and guide. Share your projects and get expert feedback!</p>
             </div>
             """)

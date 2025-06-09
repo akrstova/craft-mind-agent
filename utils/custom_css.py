@@ -3,7 +3,7 @@ CUSTOM_CSS = """
 
 .gradio-container {
     font-family: 'Comfortaa', sans-serif;
-    background: url('https://raw.githubusercontent.com/akrstova/craft-mind-agent/main/resources/background_craftpilot.png') no-repeat center center fixed;
+    background: url('https://raw.githubusercontent.com/akrstova/craftwise/main/resources/background_craftpilot.png') no-repeat center center fixed;
     background-size: cover;
     position: relative;
     min-height: 100vh;
