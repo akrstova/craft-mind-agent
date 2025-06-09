@@ -4,9 +4,16 @@ import mimetypes
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage
 from agents.planner import supervisor  # your LangGraph supervisor setup
+from agents.mentor import analyze_media_structured
+
 
 # Store uploaded file path persistently
 uploaded_file_path = {"path": None}
+state = {
+    "uploaded_file": None, 
+    "media_processed": False, 
+    "analysis_result": None, 
+}
 
 
 def encode_file_to_media_message(file_path: str):
@@ -44,20 +51,28 @@ def encode_file_to_media_message(file_path: str):
         return [{"type": "text", "text": "Unsupported file type uploaded."}]
 
 
+
 def chat_with_agent(message, history):
     # Convert history to LangChain messages
     messages = []
     for user_msg, assistant_msg in history:
         messages.append(HumanMessage(content=user_msg))
         messages.append(AIMessage(content=assistant_msg))
+   
+
+    # If a file is uploaded, attach it in proper format    
+    if uploaded_file_path["path"] and not state['media_processed']:
+        analysis = analyze_media_structured(uploaded_file_path["path"])
+        state["analysis_result"] = analysis
+        state['media_processed'] = True
+
+        # Clear uploaded file reference to avoid duplicate analysis
+        uploaded_file_path["path"] = None
+
+        return analysis
+    
+    
     messages.append(HumanMessage(content=message))
-
-    # If a file is uploaded, attach it in proper format
-    if uploaded_file_path["path"]:
-        media_msg = encode_file_to_media_message(uploaded_file_path["path"])
-        messages.append(HumanMessage(content=media_msg))
-        uploaded_file_path["path"] = None  # 🔥 clear it after use
-
     # Call supervisor
     response = supervisor.invoke({"messages": messages})
 
@@ -77,10 +92,14 @@ def chat_with_agent(message, history):
 
 def handle_file_upload(file):
     if file:
-        uploaded_file_path["path"] = file.name
+        uploaded_file_path["path"] = file.name        
+        state["media_processed"] = False
+        state["analysis_result"] = None
         return "✅ File received. It will be considered in your next message."
     else:
         uploaded_file_path["path"] = None
+        state["media_processed"] = True
+        state["analysis_result"] = None
         return "❌ File cleared."
 
 
