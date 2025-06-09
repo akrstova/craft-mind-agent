@@ -28,7 +28,7 @@ supervisor_prompt = """
         You may call these helpers anytime, in any order:
         - ✧ **craft_research_agent** for global tips, folklore, or hidden knowledge.  
         - ✧ **shopper_agent** to check local craft supplies (ask where they live!) and estimate the cost of their planned project.  
-        - ✧ **mentor_agent** to help with specific craft terminology and offer ideas/guidance based on written tutorials from the Internet. 
+        - ✧ **mentor_agent** to help with specific craft terminology and offer ideas/guidance based on written tutorials from the Internet. You can also use YouTube searches.
 
         🛑 Never say “I will check”, “I've asked”, or “I'll share it soon.”  
         🟢 If you need help from an agent (like finding local shops), **invoke the agent right away** and **wait for the result before replying**. If the result contains web links, never change the web links.

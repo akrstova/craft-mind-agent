@@ -1,3 +1,4 @@
+import json
 import os
 import base64
 import mimetypes
@@ -6,7 +7,15 @@ from fastapi.staticfiles import StaticFiles
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage
 from agents.planner import supervisor
-from analysis_utils import analyze_media_structured  
+from agents.mentor import search_youtube, model
+from analysis_utils import analyze_media_structured, extract_json, safe_json_parse
+
+
+
+from typing import Optional
+from pydantic import BaseModel
+from langchain_core.runnables import Runnable
+from langchain.prompts import PromptTemplate
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="resources"), name="static")
@@ -173,6 +182,61 @@ state = {
 }
 
 
+
+class CraftState:
+    def __init__(self):
+        self.user_message = ""
+        self.asked_for_video = False
+        self.video_url = None
+        self.project = ""
+        self.craft = ""
+        self.experience_level = ""
+
+main_state = CraftState()
+
+video_intent_prompt = PromptTemplate.from_template("""
+You are a helpful assistant that determines whether a user is asking for a video tutorial explicitly. 
+Answer only "yes" or "no". If there's no mention of the user asking for a video tutorial, always return no.
+
+User message: {message}
+""")
+
+def detect_video_request(state: CraftState, model: Runnable, messages) -> CraftState:   
+    experience = extract_project_craft_experience(messages=messages, model=model)
+    state.project = experience['project'] 
+    state.craft = experience['craft'] 
+    state.experience_level = experience['experience_level'] 
+    print("The experince values are ", experience)
+    print("The statuses of the states are ", state.project, state.craft, state.experience_level)
+    state = detect_video_request_llm(state, model)
+    
+    return state
+
+
+def detect_video_request_llm(state: CraftState, model: Runnable) -> CraftState:
+    prompt = video_intent_prompt.format(message=state.user_message)
+    result = model.invoke([HumanMessage(content=prompt)]).content.lower().strip()
+    state.asked_for_video = result.startswith("yes")
+    return state
+
+
+def fetch_youtube_video(state: CraftState) -> CraftState:
+    query = state.project + " " + state.craft + " "  + state.experience_level
+    # Replace with your working API call
+    print("the query for video search is ", query)
+    video_url = search_youtube(query)
+    print("The found video url is ", video_url)
+    state.video_url = video_url
+    return state
+
+
+def generate_final_response(state: CraftState) -> str:
+    response = ""
+    if state.video_url:
+        response+= f"\nHere's a helpful video tutorial: {state.video_url}"
+    return response
+
+
 def encode_file_to_media_message(file_path: str):
     mime_type, _ = mimetypes.guess_type(file_path)
     if not mime_type:
@@ -209,9 +273,44 @@ def encode_file_to_media_message(file_path: str):
 
 
 
+# Define prompt template
+extraction_prompt = PromptTemplate.from_template("""
+You are an assistant that extracts structured information from a conversation between a user and an assistant.
+Extract the following fields:
+1. project – what the user wants to create or work on (e.g., paper crane, knitted scarf)
+2. craft – what type of craft it involves (e.g., origami, knitting, crochet)
+3. experience level – the user's skill level (one of beginner, intermediate, advanced, or ""). If you cannot classify as beginner, intermediate, advanced, return empty string as a value
+
+Return ONLY a JSON object with these keys: "project", "craft", "experience_level".
+
+Conversation:
+{conversation}
+""")
+
+# Function to extract structured data
+def extract_project_craft_experience(messages: list, model: Runnable) -> dict:
+    conversation = "\n".join(
+        f"{'User' if isinstance(msg, HumanMessage) else 'Assistant'}: {msg.content}"
+        for msg in messages
+    )
+    prompt = extraction_prompt.format(conversation=conversation)
+    response = model.invoke([HumanMessage(content=prompt)]).content
+    parsed = extract_json(response)
+    try:
+        return parsed
+    except json.JSONDecodeError:
+        return {
+            "project": None,
+            "craft": None,
+            "experience_level": None
+        }
+
+
+
 def chat_with_agent(message, history):
     # Convert history to LangChain messages
     messages = []
+
     for user_msg, assistant_msg in history:
         messages.append(HumanMessage(content=user_msg))
         messages.append(AIMessage(content=assistant_msg))
@@ -229,8 +328,24 @@ def chat_with_agent(message, history):
         return analysis
     
     
+    
+    
+    global main_state
+    if len(messages) > 0:
+        print("The type of message id is ", type(messages[-1]))
+    main_state.user_message = messages[-1].content + " " + message if len(messages) > 0 else message
+    
     messages.append(HumanMessage(content=message))
-    # Call supervisor
+    print("The current user_message is ", main_state.user_message)
+    main_state = detect_video_request(main_state, model, messages)
+    print("the main state is ", main_state.project, main_state.experience_level, main_state.craft)
+    if main_state.asked_for_video:
+        main_state = fetch_youtube_video(main_state)
+        response = generate_final_response(main_state)
+        main_state.asked_for_video = False
+        main_state.video_url = None
+        messages.append(AIMessage(content=response))
+    
     response = supervisor.invoke({"messages": messages})
 
     # Filter response

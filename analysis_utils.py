@@ -14,6 +14,35 @@ def _encode_file(file_path: str) -> str:
         return base64.b64encode(f.read()).decode("utf-8")
 
 
+
+
+def safe_json_parse(obj):
+    if isinstance(obj, str):
+        return json.loads(obj)
+    elif isinstance(obj, dict):
+        return obj  # already parsed
+    else:
+        raise TypeError(f"Expected JSON string or dict, got {type(obj)}")
+
+
+
+def extract_json(response: str) -> dict:
+    # Match inside ```json ... ```
+    match = re.search(r"```(?:json)?\s*({.*?})\s*```", response, re.DOTALL)
+    
+    if match:
+        json_str = match.group(1)
+    else:
+        # Fallback if no code block
+        json_str = response.strip()
+    
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        return {"error": "Failed to parse JSON", "raw": response, "details": str(e)}
+
+
+
 def analyze_media_structured(file_path: str) -> str:
     """
     Analyze the uploaded image or video of a craft project.
