@@ -97,8 +97,8 @@ research_agent_prompt = PromptTemplate.from_template(
         === What is it? ===
         Explain what this craft is, where it comes from, and what makes it unique or culturally important.
 
-        === Types or Styles (if relevant) ===
-        Briefly describe any subtypes, styles, or traditions within the craft (if they exist).
+        === Types or Styles ===
+        If relevant, briefly describe any subtypes, styles, or traditions within the craft (if they exist). If not relevant, exclude this section from the answer.
 
         === Materials Needed ===
         List the essential tools or materials required to practice the craft.
@@ -106,7 +106,7 @@ research_agent_prompt = PromptTemplate.from_template(
         === How to Get Started ===
         Explain how a beginner can start — mention basic techniques, patterns, or entry-level projects.
 
-        === Cultural or Historical Context (optional) ===
+        === Cultural or Historical Context ===
         Add interesting background info if available (e.g., where/when it was traditionally practiced).
 
         Keep the tone friendly, and informative — like you're introducing the craft to someone who’s curious but knows nothing yet.
