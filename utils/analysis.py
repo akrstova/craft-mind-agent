@@ -14,8 +14,6 @@ def _encode_file(file_path: str) -> str:
         return base64.b64encode(f.read()).decode("utf-8")
 
 
-
-
 def safe_json_parse(obj):
     if isinstance(obj, str):
         return json.loads(obj)
@@ -23,8 +21,6 @@ def safe_json_parse(obj):
         return obj  # already parsed
     else:
         raise TypeError(f"Expected JSON string or dict, got {type(obj)}")
-
-
 
 def extract_json(response: str) -> dict:
     # Match inside ```json ... ```
