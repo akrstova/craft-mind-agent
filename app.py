@@ -1,13 +1,13 @@
 import json
 import base64
 import mimetypes
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
 from langchain.prompts import PromptTemplate
-from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 
 from utils.analysis import analyze_media_structured, extract_json
@@ -15,8 +15,6 @@ from agents.planner import supervisor
 from utils.custom_css import CUSTOM_CSS
 from utils.search import search_youtube
 from utils.state import CraftState
-
-
 
 load_dotenv()
 
@@ -50,8 +48,6 @@ def detect_video_request(state: CraftState, model: Runnable, messages) -> CraftS
     state.craft = experience['craft'] 
     state.experience_level = experience['experience_level'] 
     state.query = experience["query"]
-    print("The experince values are ", experience)
-    print("The statuses of the states are ", state.project, state.craft, state.experience_level)
     state = detect_video_request_llm(state, model)
     
     return state
@@ -76,10 +72,7 @@ def fetch_youtube_video(state: CraftState) -> CraftState:
             deduped_words.append(word)
             seen.add(lw)
     query = " ".join(deduped_words)
-    # Replace with your working API call
-    print("the query for video search is ", query)
     video_url = search_youtube(query)
-    print("The found video url is ", video_url)
     state.video_url = video_url
     return state
 
@@ -181,18 +174,13 @@ def chat_with_agent(message, history):
 
         return analysis
     
-    
-    
-    
     global main_state
     if len(messages) > 0:
         print("The type of message id is ", type(messages[-1]))
     main_state.user_message = messages[-1].content + " " + message if len(messages) > 0 else message
     
     messages.append(HumanMessage(content=message))
-    print("The current user_message is ", main_state.user_message)
     main_state = detect_video_request(main_state, model, messages)
-    print("the main state is ", main_state.project, main_state.experience_level, main_state.craft)
     if main_state.asked_for_video:
         main_state = fetch_youtube_video(main_state)
         response = generate_final_response(main_state)

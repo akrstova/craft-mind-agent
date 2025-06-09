@@ -51,7 +51,5 @@ supervisor = create_supervisor(
     output_mode="last_message",
 ).compile()
 
-
-
 with open("supervisor_graph.png", "wb") as f:
     f.write(supervisor.get_graph().draw_mermaid_png())
