@@ -32,7 +32,7 @@ cd craftcopilot
 ```bash
 uv venv
 source .venv/bin/activate
-uv pip install -r requirements.txt
+uv sync
 ```
 
 > ℹ️ Don't have `uv` installed?  
