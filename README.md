@@ -1,9 +1,9 @@
-# 🧶 CraftCopilot
+# 🧶 Craftwise
 
-**CraftCopilot** is an AI-native learning assistant for hands-on crafts including (but not limited to!) origami, knitting, and crochet, and even more exotic crafts like Balkan lacework or Kente cloth making.
+**Craftwise** is an AI-native learning assistant for hands-on crafts including (but not limited to!) origami, knitting, and crochet, and even more exotic crafts like Balkan lacework or Kente cloth making.
 It guides users through creative projects with smart project suggestions, real-time explanations, YouTube tutorial retrieval, and visual feedback on uploaded photos.
 
-Built with a multi-agent architecture using LangGraph and powered by LLMs, CraftCopilot helps users learn-by-doing—just like a friendly workshop mentor.
+Built with a multi-agent architecture using LangGraph and powered by LLMs, Craftwise helps users learn-by-doing—just like a friendly workshop mentor.
 
 ---
 
@@ -23,8 +23,8 @@ Built with a multi-agent architecture using LangGraph and powered by LLMs, Craft
 ### 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/akrstova/craft-copilot.git craftcopilot
-cd craftcopilot
+git clone https://github.com/akrstova/craftwise.git craftwise
+cd craftwise
 ```
 
 ### 2. **Install Dependencies with [uv](https://github.com/astral-sh/uv)**
@@ -69,7 +69,7 @@ Then open your browser at: [http://localhost:7860](http://localhost:7860)
 ## 🧭 Project Structure
 
 ```
-craftcopilot/
+craftwise/
 ├── agents/           # LangGraph agents: Planner, Mentor, Perception
 ├── analysis_utils.py # Media analysis logic
 ├── app.py            # Gradio interface
