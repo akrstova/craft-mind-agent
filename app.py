@@ -12,6 +12,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="resources"), name="static")
 
 # Custom CSS for craft-themed styling
+
 custom_css = """
 @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Comfortaa&family=Playfair+Display&display=swap');
 
@@ -260,7 +261,7 @@ def handle_file_upload(file):
 
 
 # Gradio UI
-with gr.Blocks(title="Craft Pilot", css=custom_css) as demo:
+with gr.Blocks(title="Craft Pilot", css=custom_css, theme=gr.themes.Soft()) as demo:
     with gr.Row():
         with gr.Column(scale=1):
             gr.Markdown("""
@@ -276,9 +277,9 @@ with gr.Blocks(title="Craft Pilot", css=custom_css) as demo:
         description="",
         theme=gr.themes.Soft(),
         examples=[
-            "Can you help me evaluate this paper crane?",
             "I'm learning how to knit. Any tips?",
-            "How do I make Bulgarian lace?"
+            "How do I make Bulgarian lace?",
+            "Can you help me evaluate this paper crane I made?",
         ]
     )
 
