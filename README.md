@@ -91,10 +91,8 @@ craftcopilot/
 
 ## 🧩 Ideas for Expansion
 
-- Add new crafts like embroidery or macramé  
-- Integrate local video tutorials  
-- Improve visual analysis using vision-language models  
 - Track user learning progress over time
+- Search for online or in-presence workshops and connect to teachers who know the craft
 
 ---
 
