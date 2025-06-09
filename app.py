@@ -1,5 +1,4 @@
 import json
-import os
 import base64
 import mimetypes
 from fastapi import FastAPI
@@ -8,12 +7,7 @@ import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage
 from agents.planner import supervisor
 from agents.mentor import search_youtube, model
-from analysis_utils import analyze_media_structured, extract_json, safe_json_parse
-
-
-
-from typing import Optional
-from pydantic import BaseModel
+from analysis_utils import analyze_media_structured, extract_json
 from langchain_core.runnables import Runnable
 from langchain.prompts import PromptTemplate
 
