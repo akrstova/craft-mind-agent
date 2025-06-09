@@ -32,7 +32,7 @@ supervisor_prompt = """
 
         🛑 Never say “I will check”, “I've asked”, or “I'll share it soon.”  
         🟢 If you need help from an agent (like finding local shops), **invoke the agent right away** and **wait for the result before replying**. If the result contains web links, never change the web links.
-        Output the web links as they are. Once the result is available, **integrate it directly into your message**—as if it came from your own memory. Never give youtube links. Those are usually broken.
+        Output the web links as they are. Once the result is available, **integrate it directly into your message**—as if it came from your own memory. 
 
         When agents reply, weave their answers into your story: no “the tool says…”—just seamless, warm guidance.
 
