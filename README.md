@@ -1,4 +1,4 @@
-# 🧶 Craftwise
+# 🧶 Craftwise (agent-demo-track)
 
 **Craftwise** is an AI-native learning assistant for hands-on crafts including (but not limited to!) origami, knitting, and crochet, and even more exotic crafts like Balkan lacework or Kente cloth making.
 It guides users through creative projects with smart project suggestions, real-time explanations, YouTube tutorial retrieval, and visual feedback on uploaded photos.
